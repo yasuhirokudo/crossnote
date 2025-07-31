@@ -7,7 +7,7 @@ import CryptoJS from 'crypto-js';
 import * as fs from 'fs';
 import { escape } from 'html-escaper';
 import * as path from 'path';
-import request from 'request';
+import axios from 'axios';
 import { JsonObject } from 'type-fest';
 import * as vscode from 'vscode';
 import { URI } from 'vscode-uri';
@@ -1498,11 +1498,13 @@ sidebarTOCBtn.addEventListener('click', function(event) {
           path.basename(httpSrc);
         savePath = path.resolve(this.fileDirectoryPath, savePath);
 
-        const stream = request(httpSrc).pipe(fs.createWriteStream(savePath));
-
-        stream.on('finish', () => {
-          $img.attr('src', 'file:///' + savePath);
-          return resolve(savePath);
+        axios.get(httpSrc, { responseType: 'stream' }).then((response) => {
+          const stream = fs.createWriteStream(savePath);
+          response.data.pipe(stream);
+          stream.on('finish', () => {
+            $img.attr('src', 'file:///' + savePath);
+            resolve(savePath);
+          });
         });
       });
     });
