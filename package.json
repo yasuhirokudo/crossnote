@@ -103,7 +103,6 @@
     "papaparse": "^5.4.1",
     "plantuml-encoder": "^1.4.0",
     "puppeteer-core": "^24.4.0",
-    "qiniu": "^7.9.0",
     "react": "^18.2.0",
     "react-contexify": "^6.0.0",
     "react-dom": "^18.2.0",
