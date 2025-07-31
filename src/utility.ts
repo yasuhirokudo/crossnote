@@ -181,8 +181,6 @@ export function removeFileProtocol(filePath: string): string {
   });
 }
 
-export { uploadImage } from './tools/image-uploader';
-
 /**
  * Allow unsafed `eval` function
  * Referred from:
