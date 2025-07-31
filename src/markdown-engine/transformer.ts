@@ -3,7 +3,7 @@ import { escape } from 'html-escaper';
 import * as less from 'less';
 import * as Papa from 'papaparse';
 import * as path from 'path';
-import request from 'request';
+import axios from 'axios';
 import * as temp from 'temp';
 import {
   BlockAttributes,
@@ -125,22 +125,22 @@ function downloadFileIfNecessary(filePath: string): Promise<string> {
     if (!DOWNLOADS_TEMP_FOLDER) {
       DOWNLOADS_TEMP_FOLDER = temp.mkdirSync('crossnote_downloads');
     }
-    request.get(
-      { url: filePath, encoding: 'binary' },
-      async (error, response, body) => {
-        if (error) {
-          return reject(error);
-        } else {
-          const localFilePath =
-            path.resolve(
-              DOWNLOADS_TEMP_FOLDER ?? '/tmp/crossnote_downloads',
-              computeChecksum(filePath),
-            ) + path.extname(filePath);
-          await fs.writeFile(localFilePath, body, 'binary');
-          return localFilePath;
-        }
-      },
-    );
+    axios
+      .get(filePath, { responseType: 'arraybuffer' })
+      .then((response) => {
+        const body = response.data;
+        const localFilePath =
+          path.resolve(
+            DOWNLOADS_TEMP_FOLDER ?? '/tmp/crossnote_downloads',
+            computeChecksum(filePath),
+          ) + path.extname(filePath);
+        fs.writeFile(localFilePath, body)
+          .then(() => resolve(localFilePath))
+          .catch((error) => reject(error));
+      })
+      .catch((error) => {
+        reject(error);
+      });
   });
 }
 
@@ -211,13 +211,15 @@ async function loadFile(
     }
 
     return await new Promise<string>((resolve, reject) => {
-      request(filePath, (error, response, body) => {
-        if (error) {
-          reject(error);
-        } else {
+      axios
+        .get(filePath)
+        .then((response) => {
+          const body = response.data;
           resolve(body.toString());
-        }
-      });
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   } else {
     // local file
