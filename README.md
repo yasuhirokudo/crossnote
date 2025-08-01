@@ -230,21 +230,6 @@ const config = {
   //    Your machine can get hacked if someone makes you open a markdown with malicious code while script execution is enabled.
   enableScriptExecution: false,
 
-  // Enables video/audio embed with ![]() syntax (default).
-  HTML5EmbedUseImageSyntax: true,
-
-  // Enables video/audio embed with []() syntax.
-  HTML5EmbedUseLinkSyntax: false,
-
-  // When true embed media with http:// schema in URLs. When false ignore and don't embed them.
-  HTML5EmbedIsAllowedHttp: false,
-
-  // HTML attributes to pass to audio tags.
-  HTML5EmbedAudioAttributes: 'controls preload="metadata" width="320"',
-
-  // HTML attributes to pass to video tags.
-  HTML5EmbedVideoAttributes: 'controls preload="metadata" width="320" height="240"',
-
   // Puppeteer waits for a certain timeout in milliseconds before the document export.
   puppeteerWaitForTimeout: 0,
 
