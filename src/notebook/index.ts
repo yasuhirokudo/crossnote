@@ -15,7 +15,6 @@ import useMarkdownItCodeFences from '../custom-markdown-it-features/code-fences'
 import useMarkdownItCriticMarkup from '../custom-markdown-it-features/critic-markup';
 import useMarkdownItCurlyBracketAttributes from '../custom-markdown-it-features/curly-bracket-attributes';
 import useMarkdownItEmoji from '../custom-markdown-it-features/emoji';
-import useMarkdownItHTML5Embed from '../custom-markdown-it-features/html5-embed';
 import useMarkdownItMath from '../custom-markdown-it-features/math';
 import useMarkdownItSourceMap from '../custom-markdown-it-features/sourcemap';
 import useMarkdownItWidget from '../custom-markdown-it-features/widget';
@@ -154,7 +153,6 @@ export class Notebook {
     useMarkdownItCurlyBracketAttributes(md);
     useMarkdownItCriticMarkup(md, this);
     useMarkdownItEmoji(md, this);
-    useMarkdownItHTML5Embed(md, this);
     useMarkdownItMath(md, this);
     useMarkdownItWikilink(md, this);
     useMarkdownAdmonition(md);

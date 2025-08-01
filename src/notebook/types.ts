@@ -396,44 +396,6 @@ export interface NotebookConfig {
    */
   enableScriptExecution: boolean;
   /**
-   * Whether to enable HTML5 embed.
-   *
-   * **Note:** This is dangerous and should be used with caution.
-   *
-   * @default false
-   */
-  enableHTML5Embed: boolean;
-  /**
-   * Whether to use image syntax for HTML5 embed.
-   *
-   * @default true
-   */
-  HTML5EmbedUseImageSyntax: boolean;
-  /**
-   * Whether to use link syntax for HTML5 embed.
-   *
-   * @default false
-   */
-  HTML5EmbedUseLinkSyntax: boolean;
-  /**
-   * Whether to allow HTTP protocol for HTML5 embed.
-   *   *
-   * @default false
-   */
-  HTML5EmbedIsAllowedHttp: boolean;
-  /**
-   * The audio attributes for HTML5 embed.
-   *
-   * @default `controls preload="metadata"`
-   */
-  HTML5EmbedAudioAttributes: string;
-  /**
-   * The video attributes for HTML5 embed.
-   *
-   * @default `controls preload="metadata"`
-   */
-  HTML5EmbedVideoAttributes: string;
-  /**
    * The timeout for puppeteer to wait for the page to be loaded.
    *
    * Increase the timeout if the exported file is incomplete.
@@ -574,12 +536,6 @@ export function getDefaultNotebookConfig(): NotebookConfig {
     pandocArguments: [],
     latexEngine: 'pdflatex',
     enableScriptExecution: false,
-    enableHTML5Embed: false,
-    HTML5EmbedUseImageSyntax: true,
-    HTML5EmbedUseLinkSyntax: false,
-    HTML5EmbedIsAllowedHttp: false,
-    HTML5EmbedAudioAttributes: 'controls preload="metadata"',
-    HTML5EmbedVideoAttributes: 'controls preload="metadata"',
     puppeteerWaitForTimeout: 0,
     puppeteerArgs: [],
     plantumlServer: '',
