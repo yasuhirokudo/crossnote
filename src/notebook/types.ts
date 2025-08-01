@@ -396,14 +396,6 @@ export interface NotebookConfig {
    */
   enableScriptExecution: boolean;
   /**
-   * Whether to enable HTML5 embed.
-   *
-   * **Note:** This is dangerous and should be used with caution.
-   *
-   * @default false
-   */
-  enableHTML5Embed: boolean;
-  /**
    * Whether to use image syntax for HTML5 embed.
    *
    * @default true
@@ -574,7 +566,6 @@ export function getDefaultNotebookConfig(): NotebookConfig {
     pandocArguments: [],
     latexEngine: 'pdflatex',
     enableScriptExecution: false,
-    enableHTML5Embed: false,
     HTML5EmbedUseImageSyntax: true,
     HTML5EmbedUseLinkSyntax: false,
     HTML5EmbedIsAllowedHttp: false,

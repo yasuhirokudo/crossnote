@@ -230,10 +230,6 @@ const config = {
   //    Your machine can get hacked if someone makes you open a markdown with malicious code while script execution is enabled.
   enableScriptExecution: false,
 
-  // Enables transform audio video link to to html5 embed audio video tags.
-  // Internally it enables markdown-it-html5-embed plugins.
-  enableHTML5Embed: false,
-
   // Enables video/audio embed with ![]() syntax (default).
   HTML5EmbedUseImageSyntax: true,
 
