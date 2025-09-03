@@ -1,6 +1,6 @@
 {
   "name": "crossnote",
-  "version": "0.9.14",
+  "version": "0.9.15",
   "description": "A powerful markdown notebook tool",
   "keywords": [
     "markdown"
@@ -17,9 +17,9 @@
   },
   "exports": {
     ".": {
+      "types": "./out/types/src/index.d.ts",
       "import": "./out/esm/index.mjs",
-      "require": "./out/cjs/index.cjs",
-      "types": "./out/types/src/index.d.ts"
+      "require": "./out/cjs/index.cjs"
     }
   },
   "main": "out/cjs/index.cjs",
@@ -93,7 +93,7 @@
     "markdown-it-sub": "^1.0.0",
     "markdown-it-sup": "^1.0.0",
     "md5": "^2.3.0",
-    "mermaid": "^11.5.0",
+    "mermaid": "^11.9.0",
     "minisearch": "^6.1.0",
     "mkdirp": "^3.0.1",
     "monaco-editor": "^0.43.0",
@@ -102,7 +102,7 @@
     "pako": "^2.1.0",
     "papaparse": "^5.4.1",
     "plantuml-encoder": "^1.4.0",
-    "puppeteer-core": "^24.15.0",
+    "puppeteer-core": "^24.16.2",
     "react": "^18.2.0",
     "react-contexify": "^6.0.0",
     "react-dom": "^18.2.0",
