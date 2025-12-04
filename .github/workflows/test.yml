@@ -1,4 +1,5 @@
-name: "Test"
+name: Test
+
 on:
   push:
     branches:
@@ -6,25 +7,36 @@ on:
   pull_request:
     branches:
       - develop
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
   test:
-    name: "Test"
+    name: Test
     runs-on: ubuntu-latest
     steps:
-      - name: 'Check out code'
-        uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: 'Install nodejs 20'
-        uses: actions/setup-node@v2
+
+      - name: Install nodejs
+        uses: actions/setup-node@v5
         with:
-          node-version: '20'
-      - name: 'Build and test'
-        run: |
-          corepack enable
-          yarn install
-          yarn check:all
-          yarn test
+          node-version-file: .tool-versions
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run checks
+        run: pnpm check:all
+
+      - name: Run tests
+        run: pnpm test
