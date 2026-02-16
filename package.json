@@ -69,6 +69,12 @@
       }
     ]
   },
+  "resolutions": {
+    "lodash-es": "4.17.23"
+  },
+  "overrides": {
+    "lodash-es": "4.17.23"
+  },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
