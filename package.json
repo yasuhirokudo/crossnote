@@ -79,7 +79,6 @@
     "@ungap/structured-clone": "^1.2.0",
     "@viz-js/viz": "^3.1.0",
     "async-mutex": "^0.4.0",
-    "axios": "^1.12.2",
     "bit-field": "^1.9.0",
     "case-anything": "^2.1.13",
     "cheerio": "^1.0.0-rc.12",
