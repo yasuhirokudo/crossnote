@@ -7,7 +7,7 @@ import MarkdownItFootnote from 'markdown-it-footnote';
 import MarkdownItMark from 'markdown-it-mark';
 import MarkdownItSub from 'markdown-it-sub';
 import MarkdownItSup from 'markdown-it-sup';
-import Token from 'markdown-it/lib/token';
+type Token = MarkdownIt.Token;
 import * as path from 'path';
 import { URI, Utils } from 'vscode-uri';
 import useMarkdownAdmonition from '../custom-markdown-it-features/admonition';
