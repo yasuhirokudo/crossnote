@@ -1,5 +1,4 @@
 import MarkdownIt from 'markdown-it';
-import Renderer from 'markdown-it/lib/renderer';
 import { Notebook } from '../notebook';
 
 /**
@@ -12,7 +11,7 @@ import { Notebook } from '../notebook';
  *
  */
 export default (md: MarkdownIt, notebook: Notebook) => {
-  const defaultImageRenderer: Renderer.RenderRule =
+  const defaultImageRenderer: MarkdownIt.Renderer.RenderRule =
     md.renderer.rules.image!.bind(md.renderer);
 
   md.renderer.rules.image = (tokens, idx, options, env, renderer) => {

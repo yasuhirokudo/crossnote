@@ -1,4 +1,5 @@
-import Token from 'markdown-it/lib/token';
+import MarkdownIt from 'markdown-it';
+type Token = MarkdownIt.Token;
 
 export interface Reference {
   /**
