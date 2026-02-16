@@ -3,7 +3,6 @@ import { escape } from 'html-escaper';
 import * as less from 'less';
 import * as Papa from 'papaparse';
 import * as path from 'path';
-import axios from 'axios';
 import * as temp from 'temp';
 import {
   BlockAttributes,
@@ -116,32 +115,27 @@ let DOWNLOADS_TEMP_FOLDER: string | null = null;
 /**
  * download file and return its local path
  */
-function downloadFileIfNecessary(filePath: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if (!filePath.match(/^https?:\/\//)) {
-      return resolve(filePath);
-    }
+async function downloadFileIfNecessary(filePath: string): Promise<string> {
+  if (!filePath.match(/^https?:\/\//)) {
+    return filePath;
+  }
 
-    if (!DOWNLOADS_TEMP_FOLDER) {
-      DOWNLOADS_TEMP_FOLDER = temp.mkdirSync('crossnote_downloads');
-    }
-    axios
-      .get(filePath, { responseType: 'arraybuffer' })
-      .then((response) => {
-        const body = response.data;
-        const localFilePath =
-          path.resolve(
-            DOWNLOADS_TEMP_FOLDER ?? '/tmp/crossnote_downloads',
-            computeChecksum(filePath),
-          ) + path.extname(filePath);
-        fs.writeFile(localFilePath, body)
-          .then(() => resolve(localFilePath))
-          .catch((error) => reject(error));
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
+  if (!DOWNLOADS_TEMP_FOLDER) {
+    DOWNLOADS_TEMP_FOLDER = temp.mkdirSync('crossnote_downloads');
+  }
+
+  const response = await fetch(filePath);
+  if (!response.ok) {
+    throw new Error(`Failed to download ${filePath}: ${response.statusText}`);
+  }
+  const body = Buffer.from(await response.arrayBuffer());
+  const localFilePath =
+    path.resolve(
+      DOWNLOADS_TEMP_FOLDER ?? '/tmp/crossnote_downloads',
+      computeChecksum(filePath),
+    ) + path.extname(filePath);
+  await fs.writeFile(localFilePath, body);
+  return localFilePath;
 }
 
 /**
@@ -210,17 +204,11 @@ async function loadFile(
         .replace('/blob/', '/');
     }
 
-    return await new Promise<string>((resolve, reject) => {
-      axios
-        .get(filePath)
-        .then((response) => {
-          const body = response.data;
-          resolve(body.toString());
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+    const response = await fetch(filePath);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${filePath}: ${response.statusText}`);
+    }
+    return await response.text();
   } else {
     // local file
     return await notebook.fs.readFile(filePath);
@@ -481,9 +469,9 @@ export async function transformMarkdown(
           try {
             opt = parseBlockAttributes(optMatch[0]);
 
-            (classes = opt['class'] ?? ''),
+            ((classes = opt['class'] ?? ''),
               (id = opt['id'] ?? ''),
-              (ignore = opt['ignore']);
+              (ignore = opt['ignore']));
             delete opt['class'];
             delete opt['id'];
             delete opt['ignore'];
