@@ -1,6 +1,6 @@
 {
   "name": "crossnote",
-  "version": "0.9.16",
+  "version": "0.9.20",
   "description": "A powerful markdown notebook tool",
   "keywords": [
     "markdown"
@@ -31,17 +31,17 @@
     "build:esbuild": "node build.js",
     "build:typings": "tsc --project . --declaration",
     "build:watch": "gulp clean-out && pnpm copy:files && pnpm compile:less && concurrently \"tsc --project . --watch\" \"node build.js --watch\" \"gulp watch-less\"",
-    "check:all": "npm run check:prettier && npm run check:tsc && npm run check:lint",
-    "check:lint": "eslint .",
+    "check": "pnpm check:eslint && pnpm check:prettier && pnpm check:tsc",
+    "check:eslint": "eslint .",
     "check:prettier": "prettier --check \"**/*\"",
     "check:tsc": "tsc --project .",
     "compile:less": "gulp compile-less",
     "copy:files": "gulp copy-files",
-    "fix": "npm run fix:lint && npm run fix:prettier",
-    "fix:lint": "eslint --fix .",
+    "fix": "pnpm fix:eslint && pnpm fix:prettier",
+    "fix:eslint": "eslint --fix .",
     "fix:prettier": "prettier --write \"**/*\"",
     "prepare": "husky install",
-    "prepublish": "npm run build",
+    "prepublish": "pnpm build",
     "test": "jest --no-coverage",
     "test:coverage": "jest",
     "typedoc": "typedoc src/index.ts"
@@ -70,10 +70,10 @@
     ]
   },
   "resolutions": {
-    "lodash-es": "4.17.23"
+    "lodash-es": ">=4.17.23"
   },
   "overrides": {
-    "lodash-es": "4.17.23"
+    "lodash-es": ">=4.17.23"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
@@ -94,6 +94,7 @@
     "cross-fetch": "^4.0.0",
     "crypto-js": "^4.1.1",
     "daisyui": "^3.7.3",
+    "dompurify": "^3.3.3",
     "esbuild-plugin-tailwindcss": "^1.1.1",
     "escape-string-regexp": "^5.0.0",
     "file-saver": "^2.0.5",
@@ -102,7 +103,7 @@
     "html-to-image": "^1.11.11",
     "imagemagick-cli": "^0.5.0",
     "jquery": "^3.7.1",
-    "katex": "^0.16.25",
+    "katex": "^0.16.38",
     "less": "^4.2.0",
     "markdown-it": "^14.1.1",
     "markdown-it-abbr": "^1.0.4",
@@ -113,7 +114,7 @@
     "markdown-it-sub": "^1.0.0",
     "markdown-it-sup": "^1.0.0",
     "md5": "^2.3.0",
-    "mermaid": "^11.12.1",
+    "mermaid": "^11.13.0",
     "minisearch": "^6.1.0",
     "mkdirp": "^3.0.1",
     "monaco-editor": "^0.43.0",
@@ -130,7 +131,7 @@
     "sharp": "^0.33.5",
     "simple-icons": "^9.13.0",
     "slash": "^5.1.0",
-    "sval": "^0.4.8",
+    "sval": "^0.6.9",
     "temp": "^0.9.4",
     "twemoji": "^13.1.0",
     "type-fest": "^4.3.1",
@@ -150,6 +151,7 @@
     "@simbathesailor/use-what-changed": "^2.0.0",
     "@types/cheerio": "0.22.11",
     "@types/crypto-js": "^4.1.1",
+    "@types/dompurify": "^3.2.0",
     "@types/file-saver": "^2.0.6",
     "@types/html-escaper": "^3.0.0",
     "@types/jest": "^29.5.5",
@@ -194,6 +196,7 @@
     "typedoc": "^0.25.1",
     "typescript": "^5.2.2"
   },
+  "packageManager": "pnpm@10.23.0",
   "engines": {
     "node": ">=18.0.0"
   }

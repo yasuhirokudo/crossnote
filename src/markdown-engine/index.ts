@@ -42,6 +42,7 @@ import enhanceWithResolvedImagePaths from '../render-enhancers/resolved-image-pa
 import * as utility from '../utility';
 import { removeFileProtocol } from '../utility';
 import HeadingIdGenerator from './heading-id-generator';
+import { sanitizeRenderedHTML } from './sanitize';
 import { HeadingData, generateSidebarToCHTML } from './toc';
 import { transformMarkdown } from './transformer';
 
@@ -307,7 +308,7 @@ mermaid.initialize(MERMAID_CONFIG || {})
 if (typeof(window['Reveal']) !== 'undefined') {
   function mermaidRevealHelper(event) {
     var currentSlide = event.currentSlide
-    var diagrams = currentSlide.querySelectorAll('.mermaid')
+    var diagrams = currentSlide.querySelectorAll('div.mermaid')
     for (var i = 0; i < diagrams.length; i++) {
       var diagram = diagrams[i]
       if (!diagram.hasAttribute('data-processed')) {
@@ -321,7 +322,7 @@ if (typeof(window['Reveal']) !== 'undefined') {
   Reveal.addEventListener('ready', mermaidRevealHelper)
 } else {
   // The line below will cause mermaid bug in preview.
-  // mermaid.init(null, document.querySelectorAll('.mermaid'))
+  // mermaid.init(null, document.querySelectorAll('div.mermaid'))
 }
 </script>`;
 
@@ -531,6 +532,15 @@ window["initRevealPresentation"] = async function() {
       path.resolve(
         utility.getCrossnoteBuildDirectory(),
         './styles/markdown-it-admonition.css',
+      ),
+      vscodePreviewPanel,
+    )}">`;
+
+    // style markdown-it-callout
+    styles += `<link rel="stylesheet" media="screen" href="${utility.addFileProtocol(
+      path.resolve(
+        utility.getCrossnoteBuildDirectory(),
+        './styles/markdown-it-callout.css',
       ),
       vscodePreviewPanel,
     )}">`;
@@ -769,12 +779,14 @@ window["initRevealPresentation"] = async function() {
       }
     } else if (this.notebook.config.mathRenderingOption === 'KaTeX') {
       if (options.offline) {
-        mathStyle = `<link rel="stylesheet" href="file:///${path.resolve(
-          utility.getCrossnoteBuildDirectory(),
-          './dependencies/katex/katex.min.css',
+        mathStyle = `<link rel="stylesheet" href="${utility.toFileURL(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            './dependencies/katex/katex.min.css',
+          ),
         )}">`;
       } else {
-        mathStyle = `<link rel="stylesheet" href="https://${this.notebook.config.jsdelivrCdnHost}/npm/katex@0.16.25/dist/katex.min.css">`;
+        mathStyle = `<link rel="stylesheet" href="https://${this.notebook.config.jsdelivrCdnHost}/npm/katex@0.16.38/dist/katex.min.css">`;
       }
     } else {
       mathStyle = '';
@@ -784,9 +796,11 @@ window["initRevealPresentation"] = async function() {
     let fontAwesomeStyle = '';
     if (html.indexOf('<i class="fa') >= 0) {
       if (options.offline) {
-        fontAwesomeStyle = `<link rel="stylesheet" href="file:///${path.resolve(
-          utility.getCrossnoteBuildDirectory(),
-          `./dependencies/font-awesome/css/all.min.css`,
+        fontAwesomeStyle = `<link rel="stylesheet" href="${utility.toFileURL(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            `./dependencies/font-awesome/css/all.min.css`,
+          ),
         )}">`;
       } else {
         fontAwesomeStyle = `<link rel="stylesheet" href="https://${this.notebook.config.jsdelivrCdnHost}/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css">`;
@@ -798,12 +812,14 @@ window["initRevealPresentation"] = async function() {
     let mermaidInitScript = '';
     if (html.indexOf(' class="mermaid') >= 0) {
       if (options.offline) {
-        mermaidScript = `<script type="text/javascript" src="file:///${path.resolve(
-          utility.getCrossnoteBuildDirectory(),
-          './dependencies/mermaid/mermaid.min.js',
+        mermaidScript = `<script type="text/javascript" src="${utility.toFileURL(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            './dependencies/mermaid/mermaid.min.js',
+          ),
         )}" charset="UTF-8"></script>`;
       } else {
-        mermaidScript = `<script src="https://${this.notebook.config.jsdelivrCdnHost}/npm/mermaid@11.12.1/dist/mermaid.min.js"></script>`;
+        mermaidScript = `<script src="https://${this.notebook.config.jsdelivrCdnHost}/npm/mermaid@11.13.0/dist/mermaid.min.js"></script>`;
       }
 
       mermaidInitScript += `<script type="module">
@@ -827,7 +843,7 @@ mermaid.initialize(MERMAID_CONFIG || {})
 if (typeof(window['Reveal']) !== 'undefined') {
   function mermaidRevealHelper(event) {
     var currentSlide = event.currentSlide
-    var diagrams = currentSlide.querySelectorAll('.mermaid')
+    var diagrams = currentSlide.querySelectorAll('div.mermaid')
     for (var i = 0; i < diagrams.length; i++) {
       var diagram = diagrams[i]
       if (!diagram.hasAttribute('data-processed')) {
@@ -840,11 +856,11 @@ if (typeof(window['Reveal']) !== 'undefined') {
   Reveal.addEventListener('slidetransitionend', mermaidRevealHelper)
   Reveal.addEventListener('ready', mermaidRevealHelper)
   await mermaid.run({
-    nodes: document.querySelectorAll('.mermaid')
+    nodes: document.querySelectorAll('div.mermaid')
   })
 } else {
   await mermaid.run({
-    nodes: document.querySelectorAll('.mermaid')
+    nodes: document.querySelectorAll('div.mermaid')
   })
 }
 </script>`;
@@ -855,17 +871,23 @@ if (typeof(window['Reveal']) !== 'undefined') {
     let wavedromInitScript = ``;
     if (html.indexOf(' class="wavedrom') >= 0) {
       if (options.offline) {
-        wavedromScript += `<script type="text/javascript" src="file:///${path.resolve(
-          utility.getCrossnoteBuildDirectory(),
-          './dependencies/wavedrom/skins/default.js',
+        wavedromScript += `<script type="text/javascript" src="${utility.toFileURL(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            './dependencies/wavedrom/skins/default.js',
+          ),
         )}" charset="UTF-8"></script>`;
-        wavedromScript += `<script type="text/javascript" src="file:///${path.resolve(
-          utility.getCrossnoteBuildDirectory(),
-          './dependencies/wavedrom/skins/narrow.js',
+        wavedromScript += `<script type="text/javascript" src="${utility.toFileURL(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            './dependencies/wavedrom/skins/narrow.js',
+          ),
         )}" charset="UTF-8"></script>`;
-        wavedromScript += `<script type="text/javascript" src="file:///${path.resolve(
-          utility.getCrossnoteBuildDirectory(),
-          './dependencies/wavedrom/wavedrom.min.js',
+        wavedromScript += `<script type="text/javascript" src="${utility.toFileURL(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            './dependencies/wavedrom/wavedrom.min.js',
+          ),
         )}" charset="UTF-8"></script>`;
       } else {
         wavedromScript += `<script type="text/javascript" src="https://${this.notebook.config.jsdelivrCdnHost}/npm/wavedrom@3.3.0/skins/default.js"></script>`;
@@ -885,9 +907,11 @@ if (typeof(window['Reveal']) !== 'undefined') {
     ) {
       dependentLibraryMaterials.forEach(({ key, version }) => {
         vegaScript += options.offline
-          ? `<script type="text/javascript" src="file:///${path.resolve(
-              utility.getCrossnoteBuildDirectory(),
-              `./dependencies/${key}/${key}.min.js`,
+          ? `<script type="text/javascript" src="${utility.toFileURL(
+              path.resolve(
+                utility.getCrossnoteBuildDirectory(),
+                `./dependencies/${key}/${key}.min.js`,
+              ),
             )}" charset="UTF-8"></script>`
           : `<script type="text/javascript" src="https://${this.notebook.config.jsdelivrCdnHost}/npm/${key}@${version}/build/${key}.js"></script>`;
       });
@@ -922,9 +946,11 @@ if (typeof(window['Reveal']) !== 'undefined') {
     if (yamlConfig['isPresentationMode']) {
       if (options.offline) {
         presentationScript = `
-        <script src='file:///${path.resolve(
-          utility.getCrossnoteBuildDirectory(),
-          './dependencies/reveal/js/reveal.js',
+        <script src='${utility.toFileURL(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            './dependencies/reveal/js/reveal.js',
+          ),
         )}'></script>`;
       } else {
         presentationScript = `
@@ -1023,9 +1049,11 @@ if (typeof(window['Reveal']) !== 'undefined') {
             : this.notebook.config.revealjsTheme;
 
         if (options.offline) {
-          presentationStyle += `<link rel="stylesheet" href="file:///${path.resolve(
-            utility.getCrossnoteBuildDirectory(),
-            `./dependencies/reveal/css/theme/${theme}`,
+          presentationStyle += `<link rel="stylesheet" href="${utility.toFileURL(
+            path.resolve(
+              utility.getCrossnoteBuildDirectory(),
+              `./dependencies/reveal/css/theme/${theme}`,
+            ),
           )}">`;
         } else {
           presentationStyle += `<link rel="stylesheet" href="https://${this.notebook.config.jsdelivrCdnHost}/npm/reveal.js@4.6.0/dist/theme/${theme}">`;
@@ -1063,6 +1091,16 @@ if (typeof(window['Reveal']) !== 'undefined') {
           path.resolve(
             utility.getCrossnoteBuildDirectory(),
             './styles/markdown-it-admonition.css',
+          ),
+        );
+      }
+
+      // markdown-it-callout
+      if (html.indexOf('callout') > 0) {
+        styleCSS += await this.fs.readFile(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            './styles/markdown-it-callout.css',
           ),
         );
       }
@@ -1349,9 +1387,8 @@ sidebarTOCBtn.addEventListener('click', function(event) {
     // in the bundled version of the VSCode extension.
     // So we use the cjs module instead.
     // TypeError: Invalid host defined options
-    const puppeteer = await import(
-      'puppeteer-core/lib/cjs/puppeteer/puppeteer-core.js'
-    );
+    const puppeteer =
+      await import('puppeteer-core/lib/cjs/puppeteer/puppeteer-core.js');
     const browser = await puppeteer.launch({
       args: this.notebook.config.puppeteerArgs || [],
       executablePath,
@@ -1366,8 +1403,7 @@ sidebarTOCBtn.addEventListener('click', function(event) {
 
     const page = await browser.newPage();
     const loadPath =
-      'file:///' +
-      info.path +
+      utility.toFileURL(info.path) +
       (yamlConfig['isPresentationMode'] ? '?print-pdf' : '');
     await page.goto(loadPath);
 
@@ -1448,7 +1484,7 @@ sidebarTOCBtn.addEventListener('click', function(event) {
     fs.writeFileSync(info.fd, html);
 
     if (yamlConfig['isPresentationMode']) {
-      const url = 'file:///' + info.path + '?print-pdf';
+      const url = utility.toFileURL(info.path) + '?print-pdf';
       return url;
     } else {
       await princeConvert(info.path, dest);
@@ -1486,7 +1522,7 @@ sidebarTOCBtn.addEventListener('click', function(event) {
           const stream = fs.createWriteStream(savePath);
           Readable.fromWeb(response.body as any).pipe(stream);
           stream.on('finish', () => {
-            $img.attr('src', 'file:///' + savePath);
+            $img.attr('src', utility.toFileURL(savePath));
             resolve(savePath);
           });
         });
@@ -1689,7 +1725,7 @@ sidebarTOCBtn.addEventListener('click', function(event) {
       if (ebookConfig['cover']) {
         const cover =
           ebookConfig['cover'][0] === '/'
-            ? 'file:///' + ebookConfig['cover']
+            ? utility.toFileURL(ebookConfig['cover'])
             : ebookConfig['cover'];
         $(':root')
           .children()
@@ -1718,11 +1754,13 @@ sidebarTOCBtn.addEventListener('click', function(event) {
         ebookConfig['html'] &&
         ebookConfig['html'].cdn
       ) {
-        mathStyle = `<link rel="stylesheet" href="https://${this.notebook.config.jsdelivrCdnHost}/npm/katex@0.16.25/dist/katex.min.css">`;
+        mathStyle = `<link rel="stylesheet" href="https://${this.notebook.config.jsdelivrCdnHost}/npm/katex@0.16.38/dist/katex.min.css">`;
       } else {
-        mathStyle = `<link rel="stylesheet" href="file:///${path.resolve(
-          utility.getCrossnoteBuildDirectory(),
-          './dependencies/katex/katex.min.css',
+        mathStyle = `<link rel="stylesheet" href="${utility.toFileURL(
+          path.resolve(
+            utility.getCrossnoteBuildDirectory(),
+            './dependencies/katex/katex.min.css',
+          ),
         )}">`;
       }
     }
@@ -1771,6 +1809,15 @@ sidebarTOCBtn.addEventListener('click', function(event) {
               path.resolve(
                 utility.getCrossnoteBuildDirectory(),
                 './styles/markdown-it-admonition.css',
+              ),
+            )
+          : '',
+        // markdown-it-callout
+        outputHTML.indexOf('callout') > 0
+          ? await this.fs.readFile(
+              path.resolve(
+                utility.getCrossnoteBuildDirectory(),
+                './styles/markdown-it-callout.css',
               ),
             )
           : '',
@@ -2112,7 +2159,8 @@ sidebarTOCBtn.addEventListener('click', function(event) {
         }
       }
     }
-    return $.html();
+    // Return only the head content, not the full HTML structure
+    return $('head').html() || header;
   }
 
   /**
@@ -2585,6 +2633,8 @@ sidebarTOCBtn.addEventListener('click', function(event) {
       plantumlServer: this.notebook.config.plantumlServer,
       plantumlJarPath: this.notebook.config.plantumlJarPath,
       kirokiServer: this.notebook.config.krokiServer,
+      webSequenceDiagramsServer: this.notebook.config.webSequenceDiagramsServer,
+      webSequenceDiagramsApiKey: this.notebook.config.webSequenceDiagramsApiKey,
     });
     await enhanceWithFencedCodeChunks(
       $,
@@ -2609,6 +2659,9 @@ sidebarTOCBtn.addEventListener('click', function(event) {
     // if (options.emojiToSvg) {
     //   enhanceWithEmojiToSvg($);
     // }
+
+    // Sanitize rendered HTML to prevent XSS (CVE-2025-65716)
+    sanitizeRenderedHTML($);
 
     html =
       frontMatterTable +

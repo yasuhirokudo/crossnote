@@ -4,6 +4,50 @@ Please visit https://github.com/shd101wyy/vscode-markdown-preview-enhanced/relea
 
 ## [Unreleased]
 
+## [0.9.20] - 2026-03-22
+
+### Security
+
+- Fix RCE vulnerability in `.crossnote/parser.js` hooks, by @0079522-Z461.
+
+### Updates
+
+- Update `sval` javascript interpreter to the latest `0.6.9`.
+
+## [0.9.19] - 2026-03-15
+
+### Bug fixes
+
+- Fix sanitizer for mermaid and wavedrom diagrams.
+- Fix `code_block=true` not preventing mermaid diagram rendering.
+- Fix "Open in Browser" file paths on WSL.
+
+## [0.9.18] - 2026-03-15
+
+### Bug fixes
+
+- Fix callout block rendering in file export
+
+## [0.9.17] - 2026-03-15
+
+### New features
+
+- Add markdown-it callout feature with styling https://github.com/shd101wyy/crossnote/pull/387 by [@EmmetZ](https://github.com/EmmetZ).
+- Add WebSequenceDiagrams support in `wsd` code blocks https://github.com/shd101wyy/vscode-markdown-preview-enhanced/pull/2228 by [@smhanov](https://github.com/smhanov).
+
+### Bug fixes
+
+- Remove the wrapper of custom head in HTML page https://github.com/shd101wyy/crossnote/pull/386 by [@TanShun](https://github.com/TanShun).
+
+### Security
+
+- Fix CVE-2025-65716: Sanitize rendered HTML to prevent arbitrary JavaScript execution via malicious markdown files. Added two-layer defense: server-side sanitization using cheerio (strips `<script>`, `<object>`, `<embed>`, `<applet>` tags, `on*` event handlers, dangerous URL schemes, and sandboxes all `<iframe>` elements) and client-side sanitization using DOMPurify as defense-in-depth at all `innerHTML` injection points https://github.com/shd101wyy/crossnote/pull/394
+
+### Updates
+
+- Update `mermaid` version to the latest `11.13.0`.
+- Update `katex` version to the latest `0.16.38`.
+
 ## [0.9.16] - 2025-11-01
 
 ### Updates

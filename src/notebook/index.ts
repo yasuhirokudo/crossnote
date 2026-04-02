@@ -11,6 +11,7 @@ type Token = MarkdownIt.Token;
 import * as path from 'path';
 import { URI, Utils } from 'vscode-uri';
 import useMarkdownAdmonition from '../custom-markdown-it-features/admonition';
+import useMarkdownCallout from '../custom-markdown-it-features/callout';
 import useMarkdownItCodeFences from '../custom-markdown-it-features/code-fences';
 import useMarkdownItCriticMarkup from '../custom-markdown-it-features/critic-markup';
 import useMarkdownItCurlyBracketAttributes from '../custom-markdown-it-features/curly-bracket-attributes';
@@ -156,6 +157,7 @@ export class Notebook {
     useMarkdownItMath(md, this);
     useMarkdownItWikilink(md, this);
     useMarkdownAdmonition(md);
+    useMarkdownCallout(md);
     useMarkdownItSourceMap(md);
     useMarkdownItWidget(md, this);
     return md;
