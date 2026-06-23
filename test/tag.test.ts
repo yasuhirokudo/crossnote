@@ -1,6 +1,7 @@
 import * as path from 'path';
 import Token from 'markdown-it/lib/token';
 import { Notebook } from '../src/notebook/index';
+import { itPandoc } from './helpers/pandoc';
 
 describe('Tag syntax', () => {
   let notebook: Notebook;
@@ -154,7 +155,7 @@ describe('Tag syntax', () => {
     expect(headingTokens.length).toBe(0);
   });
 
-  it('renders #tag via transformer for pandoc parser', async () => {
+  itPandoc('renders #tag via transformer for pandoc parser', async () => {
     const notebookP = await Notebook.init({
       notebookPath: path.resolve(__dirname, './markdown/test-files'),
       config: {
@@ -210,28 +211,31 @@ describe('Tag syntax', () => {
     expect(html).toContain('href="tag://parent%2Fchild"');
   });
 
-  it('preserves transformer-rendered tag on pandoc parser too (nested)', async () => {
-    const notebookP = await Notebook.init({
-      notebookPath: path.resolve(__dirname, './markdown/test-files'),
-      config: {
-        markdownParser: 'pandoc',
-      },
-    });
-    const engine = notebookP.getNoteMarkdownEngine(
-      path.resolve(
-        __dirname,
-        './markdown/test-files/test-tag-pandoc-nested.md',
-      ),
-    );
-    const { html } = await engine.parseMD('Topic #parent/child here', {
-      useRelativeFilePath: false,
-      isForPreview: true,
-      hideFrontMatter: false,
-    });
-    expect(html).toContain('<a class="tag"');
-    expect(html).toContain('data-tag="parent/child"');
-    expect(html).toContain('href="tag://parent%2Fchild"');
-  });
+  itPandoc(
+    'preserves transformer-rendered tag on pandoc parser too (nested)',
+    async () => {
+      const notebookP = await Notebook.init({
+        notebookPath: path.resolve(__dirname, './markdown/test-files'),
+        config: {
+          markdownParser: 'pandoc',
+        },
+      });
+      const engine = notebookP.getNoteMarkdownEngine(
+        path.resolve(
+          __dirname,
+          './markdown/test-files/test-tag-pandoc-nested.md',
+        ),
+      );
+      const { html } = await engine.parseMD('Topic #parent/child here', {
+        useRelativeFilePath: false,
+        isForPreview: true,
+        hideFrontMatter: false,
+      });
+      expect(html).toContain('<a class="tag"');
+      expect(html).toContain('data-tag="parent/child"');
+      expect(html).toContain('href="tag://parent%2Fchild"');
+    },
+  );
 
   it('transformer skips #tag inside markdown image alt text (markdown_yo)', async () => {
     // Regression: the transformer used to wrap `<a class="tag">` inside

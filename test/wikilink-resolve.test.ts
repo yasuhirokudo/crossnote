@@ -58,10 +58,9 @@ describe('resolveWikilink', () => {
     const nb = await loaded();
 
     const result = nb.resolveWikilink('README.md', 'docs/guide.md');
-    // The resolved path is relative to the notebook root.
-    // 'docs/guide.md' → dir is 'docs' → path.join(docs, README.md)
-    // but README.md lives at root, so relative path goes up one.
-    expect(result).toBe(path.join('docs', 'README.md'));
+    // The resolved path is relative to the notebook root and always uses
+    // forward slashes (POSIX), regardless of host platform.
+    expect(result).toBe('docs/README.md');
   });
 
   // ──────────────────────────────────────────────────────────────
@@ -74,7 +73,7 @@ describe('resolveWikilink', () => {
     nb.config.wikiLinkResolution = 'shortest';
 
     const result = nb.resolveWikilink('report.md', 'other/note.md');
-    expect(result).toBe(path.join('deep', 'nested', 'report.md'));
+    expect(result).toBe('deep/nested/report.md');
   });
 
   it('shortest mode: bare filename with multiple matches picks shortest path', async () => {
@@ -85,7 +84,7 @@ describe('resolveWikilink', () => {
 
     const result = nb.resolveWikilink('report.md', 'other/note.md');
     // 'a/report.md' has fewer path segments than 'a/b/c/report.md'
-    expect(result).toBe(path.join('a', 'report.md'));
+    expect(result).toBe('a/report.md');
   });
 
   it('shortest mode: bare filename with ties prefers same-dir note', async () => {
@@ -96,7 +95,7 @@ describe('resolveWikilink', () => {
 
     // current note is inside 'x/', so 'x/report.md' should win
     const result = nb.resolveWikilink('report.md', 'x/current.md');
-    expect(result).toBe(path.join('x', 'report.md'));
+    expect(result).toBe('x/report.md');
   });
 
   it('shortest mode: no match falls back to relative resolution', async () => {
@@ -106,7 +105,7 @@ describe('resolveWikilink', () => {
 
     // 'nonexistent.md' is not in the notes index → relative fallback
     const result = nb.resolveWikilink('nonexistent.md', 'docs/note.md');
-    expect(result).toBe(path.join('docs', 'nonexistent.md'));
+    expect(result).toBe('docs/nonexistent.md');
   });
 
   // ──────────────────────────────────────────────────────────────
@@ -120,7 +119,7 @@ describe('resolveWikilink', () => {
     nb.config.wikiLinkResolution = 'shortest';
 
     const result = nb.resolveWikilink('summary/report.md', 'projectB/other.md');
-    expect(result).toBe(path.join('projectA', 'summary', 'report.md'));
+    expect(result).toBe('projectA/summary/report.md');
   });
 
   it('shortest mode: exact notebook-relative path resolves unambiguously', async () => {
@@ -134,13 +133,13 @@ describe('resolveWikilink', () => {
       'projectA/summary/report.md',
       'other/note.md',
     );
-    expect(resultA).toBe(path.join('projectA', 'summary', 'report.md'));
+    expect(resultA).toBe('projectA/summary/report.md');
 
     const resultB = nb.resolveWikilink(
       'projectB/summary/report.md',
       'other/note.md',
     );
-    expect(resultB).toBe(path.join('projectB', 'summary', 'report.md'));
+    expect(resultB).toBe('projectB/summary/report.md');
   });
 
   it('shortest mode: ambiguous partial path picks shortest candidate', async () => {
@@ -152,7 +151,7 @@ describe('resolveWikilink', () => {
     // Both match suffix 'summary/report.md'.  They have the same depth
     // (3 segments each), so tiebreak is lexicographic → 'projectA' wins.
     const result = nb.resolveWikilink('summary/report.md', 'other/note.md');
-    expect(result).toBe(path.join('projectA', 'summary', 'report.md'));
+    expect(result).toBe('projectA/summary/report.md');
   });
 
   it('shortest mode: partial path no match falls back to relative resolution', async () => {
@@ -161,6 +160,6 @@ describe('resolveWikilink', () => {
     nb.config.wikiLinkResolution = 'shortest';
 
     const result = nb.resolveWikilink('ghost/nonexistent.md', 'docs/note.md');
-    expect(result).toBe(path.join('docs', 'ghost', 'nonexistent.md'));
+    expect(result).toBe('docs/ghost/nonexistent.md');
   });
 });

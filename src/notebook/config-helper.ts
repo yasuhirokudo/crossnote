@@ -12,6 +12,7 @@ import {
   getDefaultNotebookConfig,
   getDefaultParserConfig,
 } from './types';
+import slash from './slash';
 
 /**
  * Config keys that a workspace-provided `.crossnote/config.js` must NOT be able
@@ -92,7 +93,7 @@ export async function loadConfigsInDirectory(
 }
 
 async function getGlobalStyles(configPath: string, fs: FileSystemApi) {
-  const globalLessPath = path.join(configPath, './style.less');
+  const globalLessPath = slash(path.join(configPath, './style.less'));
 
   let fileContent: string;
   try {
@@ -135,7 +136,7 @@ async function getGlobalStyles(configPath: string, fs: FileSystemApi) {
 }
 
 async function getHeaderIncludes(configPath: string, fs: FileSystemApi) {
-  const headerIncludesPath = path.join(configPath, './head.html');
+  const headerIncludesPath = slash(path.join(configPath, './head.html'));
   let fileContent: string;
   try {
     fileContent = await fs.readFile(headerIncludesPath);
@@ -156,7 +157,7 @@ async function getConfigs(
   configPath: string,
   fs: FileSystemApi,
 ): Promise<Partial<NotebookConfig>> {
-  const configScriptPath = path.join(configPath, './config.js');
+  const configScriptPath = slash(path.join(configPath, './config.js'));
   const setupDefaultConfigScript = async () => {
     const defaultKatexConfig = getDefaultKatexConfig();
     const defaultMathjaxConfig = getDefaultMathjaxConfig();
@@ -205,7 +206,7 @@ async function getParserConfig(
   fs: FileSystemApi,
 ): Promise<ParserConfig> {
   const defaultParserConfig = getDefaultParserConfig();
-  const parserConfigPath = path.join(configPath, './parser.js');
+  const parserConfigPath = slash(path.join(configPath, './parser.js'));
   if (await fs.exists(parserConfigPath)) {
     try {
       // `parser.js` is untrusted code from the workspace. Its hooks run inside

@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { Notebook } from '../src/notebook/index';
+import { itPandoc } from './helpers/pandoc';
 
 describe('Wikilink embed integration', () => {
   let notebook: Notebook;
@@ -52,26 +53,29 @@ describe('Wikilink embed integration', () => {
     expect(html).toContain('This is an embedded note content');
   });
 
-  it('renders inline ![[markdown-file]] as embedded content with pandoc', async () => {
-    const notebookPandoc = await Notebook.init({
-      notebookPath: path.resolve(__dirname, './markdown/test-files'),
-      config: {
-        markdownParser: 'pandoc',
-      },
-    });
-    const markdown = 'Before ![[embedded-note]] after end.';
-    const engine = notebookPandoc.getNoteMarkdownEngine(
-      path.resolve(__dirname, './markdown/test-files/test-embed-pandoc.md'),
-    );
-    const { html } = await engine.parseMD(markdown, {
-      useRelativeFilePath: false,
-      isForPreview: true,
-      hideFrontMatter: false,
-    });
+  itPandoc(
+    'renders inline ![[markdown-file]] as embedded content with pandoc',
+    async () => {
+      const notebookPandoc = await Notebook.init({
+        notebookPath: path.resolve(__dirname, './markdown/test-files'),
+        config: {
+          markdownParser: 'pandoc',
+        },
+      });
+      const markdown = 'Before ![[embedded-note]] after end.';
+      const engine = notebookPandoc.getNoteMarkdownEngine(
+        path.resolve(__dirname, './markdown/test-files/test-embed-pandoc.md'),
+      );
+      const { html } = await engine.parseMD(markdown, {
+        useRelativeFilePath: false,
+        isForPreview: true,
+        hideFrontMatter: false,
+      });
 
-    expect(html).toContain('Embedded Note');
-    expect(html).toContain('This is an embedded note content');
-  });
+      expect(html).toContain('Embedded Note');
+      expect(html).toContain('This is an embedded note content');
+    },
+  );
 
   it('shows error message when embedded file is not found', async () => {
     const markdown = 'Inline ![[non-existent-file]] embed.';

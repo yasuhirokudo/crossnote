@@ -9,6 +9,7 @@
  */
 import * as path from 'path';
 import { Notebook } from '../src/notebook/index';
+import { itPandoc, describePandoc } from './helpers/pandoc';
 
 async function makeNotebook(parser: 'markdown-it' | 'pandoc' | 'markdown_yo') {
   return Notebook.init({
@@ -161,18 +162,21 @@ describe('::: fenced div (pandoc transformer rewrite)', () => {
     notebook = await makeNotebook('pandoc');
   });
 
-  it('rewrites non-code :::name to a <div class="name"> HTML block', async () => {
-    const html = await renderWith(
-      notebook,
-      ':::vertical-lock\nThis is vertical text.\n:::',
-      'colon-fence-pandoc.md',
-    );
-    expect(html).toMatch(/<div class="vertical-lock"/);
-    expect(html).toContain('This is vertical text.');
-    // The literal `:::vertical-lock {…}` regression must not appear.
-    expect(html).not.toContain(':::vertical-lock');
-    expect(html).not.toContain(':::vertical');
-  });
+  itPandoc(
+    'rewrites non-code :::name to a <div class="name"> HTML block',
+    async () => {
+      const html = await renderWith(
+        notebook,
+        ':::vertical-lock\nThis is vertical text.\n:::',
+        'colon-fence-pandoc.md',
+      );
+      expect(html).toMatch(/<div class="vertical-lock"/);
+      expect(html).toContain('This is vertical text.');
+      // The literal `:::vertical-lock {…}` regression must not appear.
+      expect(html).not.toContain(':::vertical-lock');
+      expect(html).not.toContain(':::vertical');
+    },
+  );
 
   it('still leaves :::mermaid markers for the code-fence path', async () => {
     const html = await renderWith(
@@ -244,7 +248,7 @@ describe('::: fenced div with Pandoc attributes (markdown-it)', () => {
   });
 });
 
-describe('::: fenced div with Pandoc attributes (pandoc)', () => {
+describePandoc('::: fenced div with Pandoc attributes (pandoc)', () => {
   let notebook: Notebook;
   beforeAll(async () => {
     notebook = await makeNotebook('pandoc');

@@ -32,6 +32,7 @@ import { replaceVariablesInString } from '../utility';
 import { loadConfigsInDirectory, wrapNodeFSAsApi } from './config-helper';
 import { matter, matterStringify } from './markdown';
 import { FilePath, Mentions, Note, NoteConfig, Notes } from './note';
+import slash from './slash';
 import { Reference, ReferenceMap, TagReferenceMap } from './reference';
 import Search from './search';
 import {
@@ -958,7 +959,10 @@ export class Notebook {
     return {
       note: {
         notebookPath: this.notebookPath,
-        filePath: path.relative(this.notebookPath.fsPath, absFilePath),
+        // Notebook-relative paths are always forward-slash (POSIX) so that
+        // note keys, referenceMap keys and wikilink resolution agree across
+        // platforms (path.relative yields '\' on Windows).
+        filePath: slash(path.relative(this.notebookPath.fsPath, absFilePath)),
         title,
         config: noteConfig,
         mentions: oldMentions,
@@ -1378,7 +1382,7 @@ export class Notebook {
    */
   public resolveNoteRelativePath(filePath: string) {
     if (path.isAbsolute(filePath)) {
-      return path.relative(this.notebookPath.fsPath, filePath);
+      return slash(path.relative(this.notebookPath.fsPath, filePath));
     } else {
       return filePath;
     }
@@ -1475,7 +1479,11 @@ export class Notebook {
     if (!fileExtension) {
       fileExtension = this.config.wikiLinkTargetFileExtension;
     }
-    link = path.join(parsed.dir, fileName + fileExtension);
+    // Reassemble with POSIX join on forward-slash-normalized segments so the
+    // result is stable across platforms. Plain path.join uses '\' on Windows
+    // and mangles URL-like links (e.g. `https://x.png` → `.\https:\x.png`),
+    // which then fails the downstream `^https?` URL check.
+    link = path.posix.join(slash(parsed.dir), fileName + fileExtension);
     if (hash) {
       link += hash;
     }
@@ -1502,18 +1510,22 @@ export class Notebook {
       link = link + this.config.wikiLinkTargetFileExtension;
     }
     if (link.startsWith('/')) {
-      return path.relative(
-        this.notebookPath.fsPath,
-        path.join(this.notebookPath.fsPath, '.' + link),
+      return slash(
+        path.relative(
+          this.notebookPath.fsPath,
+          path.join(this.notebookPath.fsPath, '.' + link),
+        ),
       );
     }
 
     const mode = this.config.wikiLinkResolution;
 
     if (mode === 'absolute') {
-      return path.relative(
-        this.notebookPath.fsPath,
-        path.join(this.notebookPath.fsPath, link),
+      return slash(
+        path.relative(
+          this.notebookPath.fsPath,
+          path.join(this.notebookPath.fsPath, link),
+        ),
       );
     }
 
@@ -1571,6 +1583,8 @@ export class Notebook {
     const noteDir = currentNoteFilePath
       ? path.dirname(path.join(this.notebookPath.fsPath, currentNoteFilePath))
       : this.notebookPath.fsPath;
-    return path.relative(this.notebookPath.fsPath, path.join(noteDir, link));
+    return slash(
+      path.relative(this.notebookPath.fsPath, path.join(noteDir, link)),
+    );
   }
 }
