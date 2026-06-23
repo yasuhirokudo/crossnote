@@ -743,7 +743,6 @@ export interface WebviewConfig extends Partial<NotebookConfig> {
   zoomLevel?: number;
   sourceUri?: string;
   cursorLine?: number;
-  imageUploader?: ImageUploader;
 }
 
 export enum PreviewMode {
@@ -762,5 +761,3 @@ export enum PreviewMode {
    */
   PreviewsOnly = 'Previews Only',
 }
-
-export type ImageUploader = 'imgur' | 'sm.ms' | 'qiniu';

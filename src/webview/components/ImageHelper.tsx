@@ -4,9 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState,
 } from 'react';
-import { ImageUploader } from '../../notebook';
 import PreviewContainer from '../containers/preview';
 
 export default function ImageHelper() {
@@ -21,10 +19,6 @@ export default function ImageHelper() {
   const imageHelperDialog = useRef<HTMLDialogElement>(null);
   const urlEditor = useRef<HTMLInputElement>(null);
   const imagePasterInput = useRef<HTMLInputElement>(null);
-  const imageUploaderInput = useRef<HTMLInputElement>(null);
-  const [imageUploader, setImageUploader] = useState<ImageUploader>(
-    config.imageUploader ?? 'imgur',
-  );
 
   const urlEditorOnKeyDown = useCallback(
     (event: KeyboardEvent<HTMLInputElement>) => {
@@ -63,27 +57,6 @@ export default function ImageHelper() {
       setShowImageHelper(false);
     },
     [setShowImageHelper, postMessage, sourceUri],
-  );
-
-  const dropFilesToUpload = useCallback(
-    (event: DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      // upload
-      const files = event.dataTransfer.files;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i] as { path?: string };
-        if (file && file.path) {
-          postMessage('uploadImageFile', [
-            sourceUri.current,
-            file.path,
-            imageUploader,
-          ]);
-        }
-      }
-      setShowImageHelper(false);
-    },
-    [setShowImageHelper, postMessage, imageUploader, sourceUri],
   );
 
   useEffect(() => {
@@ -165,61 +138,6 @@ export default function ImageHelper() {
                     }}
                   />
                 </div>
-              </div>
-              <div className="relative my-4">
-                <div className="divider">OR</div>
-              </div>
-              <div className="">
-                <label className="text-sm">Upload</label>
-                <div
-                  className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-800 p-4 rounded-md mt-2 cursor-pointer"
-                  onDrop={dropFilesToUpload}
-                  onDrag={dropFilesToUpload}
-                  onClick={() => {
-                    imageUploaderInput.current?.click();
-                  }}
-                >
-                  <div className="text-sm">Click me to browse image file</div>
-                  <input
-                    type="file"
-                    multiple={true}
-                    ref={imageUploaderInput}
-                    className="hidden"
-                    onChange={(event) => {
-                      const files = event.target.files ?? [];
-                      for (let i = 0; i < files.length; i++) {
-                        const file = files[i] as { path?: string };
-                        if (file && file.path) {
-                          postMessage('uploadImageFile', [
-                            sourceUri.current,
-                            file.path,
-                            imageUploader,
-                          ]);
-                        }
-                      }
-                      event.target.value = '';
-                    }}
-                  />
-                </div>
-                <div className="mt-2 text-sm">
-                  <span>use</span>
-                  <select
-                    value={imageUploader}
-                    onChange={(event) => {
-                      setImageUploader(event.target.value as ImageUploader);
-                      postMessage('setImageUploader', [event.target.value]);
-                    }}
-                    className="select select-bordered select-sm mx-2"
-                  >
-                    <option value={'imgur'}>imgur</option>
-                    <option value={'sm.ms'}>sm.ms</option>
-                    <option value={'qiniu'}>qiniu</option>
-                  </select>
-                  <span> to upload images</span>
-                </div>
-              </div>
-              <div className="text-sm mt-4">
-                <a href="#">Show history</a>
               </div>
             </div>
           </div>
