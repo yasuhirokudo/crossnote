@@ -1,0 +1,33 @@
+# Dependabot configuration.
+#
+# This fork resolves vulnerabilities by adding pnpm `overrides` in
+# pnpm-workspace.yaml (see `pnpm audit --fix`), NOT by bumping individual
+# entries in package.json. So we want Dependabot to keep *detecting*
+# vulnerabilities (alerts) and to surface fixes, but without flooding the
+# repo with one PR per advisory.
+#
+# Key choices:
+#   - open-pull-requests-limit: 0  -> disables routine *version-update* PRs.
+#     Security-update PRs (the ones generated from Dependabot alerts) are
+#     NOT subject to this limit and still get opened.
+#   - groups                       -> batches the security-update PRs that do
+#     get opened into a single PR instead of one per package.
+#   - cooldown.default-days: 3     -> ignore releases newer than 3 days,
+#     mirroring min-release-age=3 (.npmrc) / minimumReleaseAge=4320
+#     (pnpm-workspace.yaml) as a supply-chain safeguard.
+#
+# Target branch is the repository default (security/dependency-fixes), so it
+# does not need to be set explicitly.
+version: 2
+updates:
+  - package-ecosystem: "npm" # also covers pnpm (reads pnpm-lock.yaml)
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    cooldown:
+      default-days: 3
+    groups:
+      security-updates:
+        patterns:
+          - "*"
